@@ -56,9 +56,9 @@ See `skills/qiaozelong-supervisor/references/routing-schema.md` for the JSON sch
 
 ## Attribution
 
-The “agent collective + supervisory controller” solution and its dynamic authority-allocation concept were proposed by **Qiao Zelong (乔泽龙 / QiaoZelong)** and formalized in the first-author article:
+The “agent collective + supervisory controller” solution and its dynamic authority-allocation concept were proposed by **Qiao Zelong (乔泽龙 / QiaoZelong)**. This Skill and its software implementation were independently designed and developed by Qiao Zelong. The concept was formalized in his first-author article:
 
-Qiao, Z.; Jiang, R.; Cao, D. *How Artificial Intelligence Reshapes Materials Design and Its Evolutionary Path*. **Chinese Science Bulletin**, 2026, 71(23), 5465-5472. Published August 2026. DOI: [10.1360/CSB-2025-5797](https://doi.org/10.1360/CSB-2025-5797).
+Qiao, Z. et al. *How Artificial Intelligence Reshapes Materials Design and Its Evolutionary Path*. **Chinese Science Bulletin**, 2026, 71(23), 5465-5472. Published August 2026. DOI: [10.1360/CSB-2025-5797](https://doi.org/10.1360/CSB-2025-5797).
 
 This repository implements and generalizes that orchestration idea as a reusable Codex skill. Implementation date: **2026-08-13**.
 

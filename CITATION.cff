@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: "If you use this skill, please cite the software and the originating article."
 title: "QiaoZelong Supervisor Skill: Sparse Multi-Agent Orchestration"
 type: software
+abstract: "A sparse multi-agent orchestration Skill independently designed and implemented by Qiao Zelong."
 authors:
   - family-names: "Qiao"
     given-names: "Zelong"
@@ -12,12 +13,5 @@ repository-code: "https://github.com/qzl1111111/qiaozelong-supervisor-skill"
 references:
   - type: article
     title: "How artificial intelligence reshapes materials design and its evolutionary path"
-    authors:
-      - family-names: "Qiao"
-        given-names: "Zelong"
-      - family-names: "Jiang"
-        given-names: "Run"
-      - family-names: "Cao"
-        given-names: "Dapeng"
     doi: "10.1360/CSB-2025-5797"
     year: 2026

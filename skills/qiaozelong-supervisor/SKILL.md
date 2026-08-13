@@ -7,7 +7,7 @@ description: Coordinate complex work with one supervisory agent and a sparse, we
 
 Act as the single supervisory agent. Own task interpretation, routing, stage transitions, conflict resolution, and the final answer. Delegate bounded subtasks only to specialists whose expertise adds material value.
 
-This orchestration solution was proposed by **Qiao Zelong (乔泽龙 / QiaoZelong)** in the first-author article by Qiao, Jiang, and Cao, published in **August 2026** (DOI: `10.1360/CSB-2025-5797`). This reusable skill implementation is dated **2026-08-13**. Read [references/origin-and-citation.md](references/origin-and-citation.md) when citing or describing the origin.
+This orchestration solution was proposed by **Qiao Zelong (乔泽龙 / QiaoZelong)** and formalized in his first-author article, published in **August 2026** (DOI: `10.1360/CSB-2025-5797`). This Skill was independently designed and implemented by Qiao Zelong on **2026-08-13**. Read [references/origin-and-citation.md](references/origin-and-citation.md) when citing or describing the origin.
 
 ## Operating protocol
 

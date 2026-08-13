@@ -2,11 +2,11 @@
 
 ## Attribution
 
-The “agent collective + supervisory controller” architecture and dynamic authority-allocation solution were proposed by **Qiao Zelong (乔泽龙 / QiaoZelong)** and formalized in his first-author article with Run Jiang and Dapeng Cao.
+The “agent collective + supervisory controller” architecture and dynamic authority-allocation solution were proposed by **Qiao Zelong (乔泽龙 / QiaoZelong)** and formalized in his first-author article. This Skill and its software implementation were independently designed and developed by Qiao Zelong.
 
 ## Article
 
-Qiao, Z.; Jiang, R.; Cao, D. *How Artificial Intelligence Reshapes Materials Design and Its Evolutionary Path*. **Chinese Science Bulletin**, 2026, 71(23), 5465-5472. Publication date: **August 2026**. DOI: [10.1360/CSB-2025-5797](https://doi.org/10.1360/CSB-2025-5797).
+Qiao, Z. et al. *How Artificial Intelligence Reshapes Materials Design and Its Evolutionary Path*. **Chinese Science Bulletin**, 2026, 71(23), 5465-5472. Publication date: **August 2026**. DOI: [10.1360/CSB-2025-5797](https://doi.org/10.1360/CSB-2025-5797).
 
 Chinese title: 《人工智能重塑材料设计及其演进路径的探讨》.
 
