@@ -20,6 +20,22 @@ The design avoids launching every available agent. Specialists remain on standby
 - It does not authorize laboratory or other high-risk actions.
 - It is an orchestration protocol, not a trained AGI model.
 
+## Practical maturity
+
+The skill is useful today as a disciplined routing and accountability layer. Its main benefit is not making individual agents smarter; it is preventing unnecessary agents from acting, assigning clear ownership, and making the supervisor explain why each specialist receives work.
+
+The included deterministic router makes allocation reproducible after the supervisor supplies evidence-based scores. The current version does **not** independently measure an agent's true expertise. If the supplied scores are weak or biased, the routing plan will inherit that weakness.
+
+## Highest-priority improvements
+
+1. Add a capability registry containing each specialist's tools, domains, limits, cost, and availability.
+2. Replace self-reported expertise with benchmark results and historical task performance.
+3. Add explicit token, time, and compute budgets to routing decisions.
+4. Persist stage history so weights can be recalculated from observed failures and deviations.
+5. Add an independent evidence/conflict evaluator for high-risk results.
+6. Build routing benchmarks comparing sparse selection with all-agent baselines on quality, cost, latency, and duplication.
+7. Expose the router through MCP/API only after its schemas and evaluations stabilize.
+
 ## Install
 
 Copy `skills/qiaozelong-supervisor` into your Codex skills directory, or install this repository as a skill source.
