@@ -2,6 +2,8 @@
 
 Use the router when a reproducible allocation record is useful. The router enforces delegation gates, capability coverage, sparse selection, budget limits, and risk review. It does not judge semantic truth; the supervisor must ground scores in observable evidence.
 
+For v1.3 registry-backed scoring, omit `specialists`, add optional `relevant_domains` and `required_tools`, and pass `--registry`. Read [capability-registry.md](capability-registry.md) for the registry schema and deterministic derivation rules. The manual schema below remains supported.
+
 ## Input
 
 ```json
@@ -71,6 +73,7 @@ If a required capability remains uncovered, the output is low-confidence and req
 The output contains:
 
 - execution mode and primary specialist;
+- scoring source (`manual_scores` or `capability_registry_v1`);
 - activated specialists, score components, score evidence, weights, costs, and capability gains;
 - standby specialists with explicit rejection reasons;
 - required, covered, and uncovered capabilities;

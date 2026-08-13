@@ -24,20 +24,19 @@ The design avoids launching every available agent. Specialists remain on standby
 
 The skill is useful today as a disciplined routing and accountability layer. Its main benefit is not making individual agents smarter; it is preventing unnecessary agents from acting, assigning clear ownership, and making the supervisor explain why each specialist receives work.
 
-The included deterministic router makes allocation reproducible after the supervisor supplies evidence-based scores. Version 1.2 preserves the version 1.1 routing behavior and adds one portable Skill definition, host-specific delegation adapters, natural-language discovery triggers, automatic Codex/Claude/Hermes installation detection, and a strict primary-weight invariant. It therefore enforces “smallest sufficient team” instead of merely recommending it.
+The included deterministic router makes allocation reproducible. Version 1.3 adds a persistent capability-registry schema and converts capability, domain and tool coverage, measured benchmarks, historical outcomes, cost, and availability into auditable routing inputs. Manual scoring remains available for backward compatibility.
 
-The current version does **not** independently measure an agent's true expertise. If the supplied scores are weak or biased, the routing plan will inherit that weakness. Scores should be backed by tools, benchmarks, or prior task evidence rather than self-description.
+The current version does **not** run benchmarks automatically. Registry quality still depends on traceable benchmark sources and reviewed outcome records; placeholder or self-reported entries are not verified expertise.
 
 ## Highest-priority improvements
 
-1. Add a persistent capability registry containing each specialist's tools, domains, limits, cost, and availability.
-2. Replace manually supplied expertise with benchmark results and historical task performance.
-3. Map normalized cost to real token, time, compute, and monetary budgets.
-4. Persist stage history so weights can be recalculated from observed failures and deviations.
-5. Add an independent evidence/conflict evaluator for high-risk results.
-6. Build routing benchmarks comparing sparse selection with all-agent baselines on quality, cost, latency, and duplication.
-7. Add tested adapters for more Agent Skills hosts without weakening the shared routing policy.
-8. Expose the router through MCP/API only after its schemas and evaluations stabilize.
+1. Automate signed or otherwise tamper-evident benchmark and outcome ingestion.
+2. Map normalized cost to real token, time, compute, and monetary budgets.
+3. Persist stage history so weights can be recalculated from observed failures and deviations.
+4. Add an independent evidence/conflict evaluator for high-risk results.
+5. Build routing benchmarks comparing sparse selection with all-agent baselines on quality, cost, latency, and duplication.
+6. Add tested adapters for more Agent Skills hosts without weakening the shared routing policy.
+7. Expose the router through MCP/API only after its schemas and evaluations stabilize.
 
 ## Install
 
@@ -74,7 +73,13 @@ The included router can validate a supervisor's structured scoring decision:
 python skills/qiaozelong-supervisor/scripts/route_specialists.py route-request.json
 ```
 
-See `skills/qiaozelong-supervisor/references/routing-schema.md` for the JSON schema.
+Version 1.3 can instead derive specialist scores from a persistent registry:
+
+```powershell
+python skills/qiaozelong-supervisor/scripts/route_specialists.py task.json --registry capability-registry.json
+```
+
+See `skills/qiaozelong-supervisor/references/routing-schema.md` and `capability-registry.md` for the schemas. A clearly marked example registry is included for adaptation; its placeholder sources are not performance evidence.
 
 ## Attribution
 

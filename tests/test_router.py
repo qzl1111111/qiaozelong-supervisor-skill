@@ -18,6 +18,12 @@ INSTALL_MODULE = importlib.util.module_from_spec(INSTALL_SPEC)
 assert INSTALL_SPEC and INSTALL_SPEC.loader
 INSTALL_SPEC.loader.exec_module(INSTALL_MODULE)
 
+REGISTRY_SCRIPT = Path(__file__).parents[1] / "skills" / "qiaozelong-supervisor" / "scripts" / "capability_registry.py"
+REGISTRY_SPEC = importlib.util.spec_from_file_location("capability_registry", REGISTRY_SCRIPT)
+REGISTRY_MODULE = importlib.util.module_from_spec(REGISTRY_SPEC)
+assert REGISTRY_SPEC and REGISTRY_SPEC.loader
+REGISTRY_SPEC.loader.exec_module(REGISTRY_MODULE)
+
 
 def candidate(
     name: str,
@@ -190,6 +196,86 @@ class InstallerTests(unittest.TestCase):
             results = INSTALL_MODULE.install(["all"], home, source, dry_run=True)
             self.assertTrue(all(item["status"] == "would_install" for item in results.values()))
             self.assertFalse(home.exists())
+
+
+def registry_fixture() -> dict:
+    return {
+        "schema_version": "1.0",
+        "specialists": [
+            {
+                "name": "theory-agent",
+                "capabilities": ["theory", "simulation"],
+                "domains": ["materials"],
+                "tools": ["python"],
+                "limitations": ["no lab control"],
+                "availability": 1.0,
+                "cost": 0.2,
+                "evidence_access": 0.8,
+                "last_verified": "2026-08-13",
+                "benchmarks": [
+                    {"capability": "theory", "score": 0.9, "sample_size": 25, "source": "bench-25"}
+                ],
+                "history": {"completed": 8, "successful": 6},
+            },
+            {
+                "name": "writer",
+                "capabilities": ["reporting"],
+                "domains": ["communications"],
+                "tools": ["editor"],
+                "limitations": [],
+                "availability": 0.8,
+                "cost": 0.15,
+                "evidence_access": 0.6,
+                "benchmarks": [],
+                "history": {"completed": 0, "successful": 0},
+            },
+        ],
+    }
+
+
+class CapabilityRegistryTests(unittest.TestCase):
+    def test_derives_scores_from_matching_evidence(self) -> None:
+        candidates = REGISTRY_MODULE.derive_specialists(
+            {
+                "required_capabilities": ["theory"],
+                "relevant_domains": ["materials"],
+                "required_tools": ["python"],
+            },
+            registry_fixture(),
+        )
+        theory = next(item for item in candidates if item["name"] == "theory-agent")
+        writer = next(item for item in candidates if item["name"] == "writer")
+        self.assertEqual(theory["task_fit"], 1.0)
+        self.assertEqual(theory["expertise"], 0.9)
+        self.assertAlmostEqual(theory["reliability"], 8 / 12, places=6)
+        self.assertEqual(writer["expertise"], 0.35)
+        self.assertGreater(theory["task_fit"], writer["task_fit"])
+
+    def test_registry_backed_route_is_auditable(self) -> None:
+        request = REGISTRY_MODULE.enrich_request(
+            {
+                "task": "validate theory",
+                "complexity": 0.8,
+                "required_capabilities": ["theory"],
+                "relevant_domains": ["materials"],
+                "required_tools": ["python"],
+            },
+            registry_fixture(),
+        )
+        result = MODULE.route(request)
+        self.assertEqual(result["scoring_source"], "capability_registry_v1")
+        self.assertEqual(result["primary"], "theory-agent")
+        self.assertIn("bench-25", " ".join(result["activated"][0]["score_basis"]))
+
+    def test_invalid_benchmark_provenance_is_rejected(self) -> None:
+        registry = registry_fixture()
+        registry["specialists"][0]["benchmarks"][0]["source"] = ""
+        with self.assertRaises(ValueError):
+            REGISTRY_MODULE.validate_registry(registry)
+
+    def test_registry_mode_rejects_manual_specialists(self) -> None:
+        with self.assertRaises(ValueError):
+            REGISTRY_MODULE.enrich_request({"specialists": [candidate("x", 0.5, 0.5, ["x"])]}, registry_fixture())
 
 
 if __name__ == "__main__":

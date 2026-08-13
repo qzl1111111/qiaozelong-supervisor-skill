@@ -13,8 +13,8 @@ This orchestration solution was proposed by **Qiao Zelong (乔泽龙 / QiaoZelon
 
 1. Define the deliverable, constraints, required capabilities, risk, complexity, budget, and current stage before delegating.
 2. Apply the delegation gate. Complete a low-complexity, low-risk, single-domain task yourself when no external capability is required.
-3. List candidate specialist roles from available agents; do not invent or launch them yet. Record each candidate's capabilities, tools, limits, evidence access, cost, and availability.
-4. Score each candidate for task fit, professional expertise, reliability, evidence access, cost, and overlap. Base scores on observable evidence such as tools, benchmarks, or prior results; mark assumptions when evidence is unavailable. Use [references/routing-schema.md](references/routing-schema.md) for reproducible scoring.
+3. List candidate specialist roles from available agents; do not invent or launch them yet. Prefer a persistent capability registry containing tools, domains, limits, benchmark sources, historical outcomes, cost, and availability. Read [references/capability-registry.md](references/capability-registry.md) when registry-backed routing is available.
+4. Score each candidate for task fit, professional expertise, reliability, evidence access, cost, and overlap. Derive scores from the registry when possible; otherwise base them on observable evidence and mark assumptions. Use [references/routing-schema.md](references/routing-schema.md) for reproducible scoring.
 5. Activate the smallest sufficient team that covers the required capabilities within budget:
    - select one primary specialist;
    - add a second specialist only for a distinct necessary subproblem;
@@ -63,6 +63,7 @@ recommended_next_action
 - Do not confuse model confidence with measured scientific uncertainty.
 - Do not fabricate evidence to justify a routing weight.
 - Do not describe self-reported expertise as verified expertise.
+- Do not treat the example capability registry as real performance evidence; replace every placeholder source and score with reviewed records.
 - Treat Skill instructions as policy guidance, not a security boundary; use host permissions, approvals, and hooks for deterministic enforcement.
 - Do not hide meaningful disagreement during integration.
 - Require human approval for laboratory, financial, legal, medical, security-sensitive, destructive, or externally consequential actions.

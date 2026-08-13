@@ -94,6 +94,7 @@ def validate_request(request: dict[str, Any]) -> tuple[list[dict[str, Any]], lis
 
 def route(request: dict[str, Any]) -> dict[str, Any]:
     ranked, required = validate_request(request)
+    scoring_source = str(request.get("scoring_source", "manual_scores"))
     threshold = bounded(request.get("threshold", 0.55), "threshold")
     risk = bounded(request.get("risk", 0.0), "risk")
     complexity = bounded(request.get("complexity", 0.5), "complexity")
@@ -108,6 +109,7 @@ def route(request: dict[str, Any]) -> dict[str, Any]:
             "task": request.get("task", ""),
             "stage": request.get("stage", "unspecified"),
             "mode": "supervisor_only",
+            "scoring_source": scoring_source,
             "primary": "supervisor",
             "activated": [],
             "standby": [
@@ -164,6 +166,7 @@ def route(request: dict[str, Any]) -> dict[str, Any]:
             "task": request.get("task", ""),
             "stage": request.get("stage", "unspecified"),
             "mode": "blocked",
+            "scoring_source": scoring_source,
             "primary": "supervisor",
             "activated": [],
             "standby": [
@@ -239,6 +242,7 @@ def route(request: dict[str, Any]) -> dict[str, Any]:
         "task": request.get("task", ""),
         "stage": request.get("stage", "unspecified"),
         "mode": "delegated",
+        "scoring_source": scoring_source,
         "primary": activated[0]["name"],
         "activated": activated,
         "standby": standby,
@@ -255,10 +259,17 @@ def route(request: dict[str, Any]) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create a sparse specialist routing plan")
     parser.add_argument("request", type=Path, help="Path to a UTF-8 JSON routing request")
+    parser.add_argument("--registry", type=Path, help="Optional capability registry used to derive specialist scores")
     parser.add_argument("--output", type=Path, help="Optional output JSON path")
     args = parser.parse_args()
 
-    result = route(json.loads(args.request.read_text(encoding="utf-8")))
+    request = json.loads(args.request.read_text(encoding="utf-8"))
+    if args.registry:
+        from capability_registry import enrich_request
+
+        registry = json.loads(args.registry.read_text(encoding="utf-8"))
+        request = enrich_request(request, registry)
+    result = route(request)
     text = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(text, encoding="utf-8")

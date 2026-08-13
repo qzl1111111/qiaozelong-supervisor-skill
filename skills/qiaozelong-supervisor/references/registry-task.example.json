@@ -1,0 +1,12 @@
+{
+  "task": "Evaluate a materials-theory hypothesis and review the evidence",
+  "stage": "theory_validation",
+  "complexity": 0.8,
+  "risk": 0.7,
+  "budget": 0.6,
+  "threshold": 0.55,
+  "max_active": 2,
+  "required_capabilities": ["theory"],
+  "relevant_domains": ["materials-science"],
+  "required_tools": ["python"]
+}

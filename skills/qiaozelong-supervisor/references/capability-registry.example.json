@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "specialists": [
+    {
+      "name": "theory-agent",
+      "capabilities": ["theory", "simulation"],
+      "domains": ["materials-science"],
+      "tools": ["python"],
+      "limitations": ["no laboratory control"],
+      "availability": 1.0,
+      "cost": 0.25,
+      "evidence_access": 0.8,
+      "reviewer": false,
+      "last_verified": "2026-08-13",
+      "benchmarks": [
+        {
+          "capability": "theory",
+          "score": 0.82,
+          "sample_size": 20,
+          "source": "replace-with-traceable-benchmark-source"
+        }
+      ],
+      "history": {"completed": 12, "successful": 9}
+    },
+    {
+      "name": "evidence-reviewer",
+      "capabilities": ["evidence-review", "reporting"],
+      "domains": ["materials-science"],
+      "tools": ["web-search"],
+      "limitations": ["does not execute simulations"],
+      "availability": 0.8,
+      "cost": 0.2,
+      "evidence_access": 0.95,
+      "reviewer": true,
+      "last_verified": "2026-08-13",
+      "benchmarks": [
+        {
+          "capability": "evidence-review",
+          "score": 0.78,
+          "sample_size": 15,
+          "source": "replace-with-traceable-benchmark-source"
+        }
+      ],
+      "history": {"completed": 10, "successful": 8}
+    }
+  ]
+}
