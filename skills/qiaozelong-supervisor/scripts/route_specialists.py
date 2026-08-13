@@ -200,7 +200,11 @@ def route(request: dict[str, Any]) -> dict[str, Any]:
             budget_used += candidate_cost(reviewer)
 
     selected_names = {item["name"] for item in selected}
-    total = sum(max(item["marginal_utility"], 0.01) for item in selected)
+    allocation_utilities = [max(item["marginal_utility"], 0.01) for item in selected]
+    if allocation_utilities:
+        primary_floor = max(allocation_utilities[1:], default=0.0) + 0.01
+        allocation_utilities[0] = max(allocation_utilities[0], primary_floor)
+    total = sum(allocation_utilities)
     activated = []
     for index, item in enumerate(selected):
         activated.append(
@@ -209,7 +213,7 @@ def route(request: dict[str, Any]) -> dict[str, Any]:
                 "score": item["score"],
                 "score_components": item["score_components"],
                 "score_basis": item["score_basis"],
-                "weight": round(max(item["marginal_utility"], 0.01) / total, 6),
+                "weight": round(allocation_utilities[index] / total, 6),
                 "cost": candidate_cost(item),
                 "capabilities": item["capabilities"],
                 "new_capabilities": item["new_capabilities"],

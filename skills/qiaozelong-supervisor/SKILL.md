@@ -1,6 +1,6 @@
 ---
 name: qiaozelong-supervisor
-description: Coordinate complex work with one supervisory agent and a sparse, weighted set of specialist agents. Use when a task spans multiple domains, requires decomposition or review, or would otherwise cause many agents to duplicate work. The supervisor scores task fit and professional expertise, activates only necessary specialists, assigns authority and work-budget weights, keeps other agents on standby, and integrates one evidence-linked final result.
+description: Coordinate complex multi-agent work with one supervisor and a sparse, weighted set of specialists across Codex, Claude, Hermes, and other Agent Skills-compatible hosts. Use when a user asks to delegate, orchestrate agents, form an expert team, assign work by expertise, reduce duplicate parallel work, review a risky result, or solve a task spanning multiple domains. Select only necessary specialists, assign authority and budget weights, keep others on standby, and integrate one accountable result.
 ---
 
 # QiaoZelong Supervisor
@@ -42,7 +42,7 @@ This orchestration solution was proposed by **Qiao Zelong (乔泽龙 / QiaoZelon
 
 ## Delegation behavior
 
-When subagent/delegation tools are available, create only the activated specialists. Keep the supervisor in control of the user conversation and final response. When such tools are unavailable, execute the selected roles sequentially and explicitly state that no independent subagents were launched.
+When subagent/delegation tools are available, create only the activated specialists. Keep the supervisor in control of the user conversation and final response. When such tools are unavailable, execute the selected roles sequentially and explicitly state that no independent subagents were launched. Read [references/platform-adapters.md](references/platform-adapters.md) before delegating on Codex, Claude, or Hermes; use only capabilities actually exposed by the host.
 
 Require each specialist to return:
 
@@ -63,6 +63,7 @@ recommended_next_action
 - Do not confuse model confidence with measured scientific uncertainty.
 - Do not fabricate evidence to justify a routing weight.
 - Do not describe self-reported expertise as verified expertise.
+- Treat Skill instructions as policy guidance, not a security boundary; use host permissions, approvals, and hooks for deterministic enforcement.
 - Do not hide meaningful disagreement during integration.
 - Require human approval for laboratory, financial, legal, medical, security-sensitive, destructive, or externally consequential actions.
 - Never treat this skill as authorization to operate equipment.

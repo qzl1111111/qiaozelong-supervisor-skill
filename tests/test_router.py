@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -10,6 +11,12 @@ SPEC = importlib.util.spec_from_file_location("route_specialists", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC and SPEC.loader
 SPEC.loader.exec_module(MODULE)
+
+INSTALL_SCRIPT = Path(__file__).parents[1] / "skills" / "qiaozelong-supervisor" / "scripts" / "install_skill.py"
+INSTALL_SPEC = importlib.util.spec_from_file_location("install_skill", INSTALL_SCRIPT)
+INSTALL_MODULE = importlib.util.module_from_spec(INSTALL_SPEC)
+assert INSTALL_SPEC and INSTALL_SPEC.loader
+INSTALL_SPEC.loader.exec_module(INSTALL_MODULE)
 
 
 def candidate(
@@ -125,10 +132,64 @@ class RouterTests(unittest.TestCase):
         primary = next(item for item in result["activated"] if item["name"] == "primary")
         self.assertEqual(primary["score_basis"], ["test fixture"])
 
+    def test_primary_weight_remains_strictly_highest(self) -> None:
+        result = MODULE.route(
+            {
+                "task": "analysis with a stronger critic",
+                "complexity": 0.8,
+                "risk": 0.9,
+                "required_capabilities": ["analysis"],
+                "budget": 0.6,
+                "max_active": 2,
+                "specialists": [
+                    candidate("primary", 0.70, 0.70, ["analysis"], cost=0.2),
+                    candidate("critic", 1.0, 1.0, ["review"], reviewer=True, cost=0.2, overlap=0.0),
+                ],
+            }
+        )
+        primary_weight = result["activated"][0]["weight"]
+        self.assertTrue(all(primary_weight > item["weight"] for item in result["activated"][1:]))
+
     def test_invalid_score_is_rejected(self) -> None:
         bad = candidate("bad", 1.2, 0.5, ["analysis"])
         with self.assertRaises(ValueError):
             MODULE.route({"task": "x", "complexity": 0.8, "specialists": [bad]})
+
+
+class InstallerTests(unittest.TestCase):
+    def test_auto_detects_cli_and_configuration_roots(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            home = Path(temp_dir)
+            (home / ".hermes").mkdir()
+
+            def fake_which(command: str) -> str | None:
+                return "C:/tools/claude.exe" if command == "claude" else None
+
+            self.assertEqual(INSTALL_MODULE.detect_targets(home, fake_which), ["claude", "hermes"])
+
+    def test_install_all_and_protect_existing_copies(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            home = Path(temp_dir) / "home"
+            source = Path(temp_dir) / "source"
+            source.mkdir()
+            (source / "SKILL.md").write_text("---\nname: test\n---\n", encoding="utf-8")
+
+            results = INSTALL_MODULE.install(["all"], home, source)
+            self.assertTrue(all(item["status"] == "installed" for item in results.values()))
+            for relative_path in INSTALL_MODULE.TARGETS.values():
+                self.assertTrue((home / relative_path / "SKILL.md").is_file())
+
+            second_results = INSTALL_MODULE.install(["all"], home, source)
+            self.assertTrue(all(item["status"] == "exists" for item in second_results.values()))
+
+    def test_dry_run_does_not_write(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            home = Path(temp_dir) / "home"
+            source = Path(temp_dir) / "source"
+            source.mkdir()
+            results = INSTALL_MODULE.install(["all"], home, source, dry_run=True)
+            self.assertTrue(all(item["status"] == "would_install" for item in results.values()))
+            self.assertFalse(home.exists())
 
 
 if __name__ == "__main__":

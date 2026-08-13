@@ -6,7 +6,7 @@ abstract: "A sparse multi-agent orchestration Skill independently designed and i
 authors:
   - family-names: "Qiao"
     given-names: "Zelong"
-version: "1.1.0"
+version: "1.2.0"
 date-released: "2026-08-13"
 license: "MIT"
 repository-code: "https://github.com/qzl1111111/qiaozelong-supervisor-skill"
