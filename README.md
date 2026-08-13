@@ -24,13 +24,15 @@ The design avoids launching every available agent. Specialists remain on standby
 
 The skill is useful today as a disciplined routing and accountability layer. Its main benefit is not making individual agents smarter; it is preventing unnecessary agents from acting, assigning clear ownership, and making the supervisor explain why each specialist receives work.
 
-The included deterministic router makes allocation reproducible after the supervisor supplies evidence-based scores. The current version does **not** independently measure an agent's true expertise. If the supplied scores are weak or biased, the routing plan will inherit that weakness.
+The included deterministic router makes allocation reproducible after the supervisor supplies evidence-based scores. Version 1.1 adds a supervisor-only gate for simple tasks, required-capability coverage, marginal-utility selection, normalized budget limits, score-component auditing, and explicit uncovered-capability escalation. It therefore enforces “smallest sufficient team” instead of merely recommending it.
+
+The current version does **not** independently measure an agent's true expertise. If the supplied scores are weak or biased, the routing plan will inherit that weakness. Scores should be backed by tools, benchmarks, or prior task evidence rather than self-description.
 
 ## Highest-priority improvements
 
-1. Add a capability registry containing each specialist's tools, domains, limits, cost, and availability.
-2. Replace self-reported expertise with benchmark results and historical task performance.
-3. Add explicit token, time, and compute budgets to routing decisions.
+1. Add a persistent capability registry containing each specialist's tools, domains, limits, cost, and availability.
+2. Replace manually supplied expertise with benchmark results and historical task performance.
+3. Map normalized cost to real token, time, compute, and monetary budgets.
 4. Persist stage history so weights can be recalculated from observed failures and deviations.
 5. Add an independent evidence/conflict evaluator for high-risk results.
 6. Build routing benchmarks comparing sparse selection with all-agent baselines on quality, cost, latency, and duplication.
