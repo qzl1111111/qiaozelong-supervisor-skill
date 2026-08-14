@@ -1,15 +1,15 @@
 cff-version: 1.2.0
 message: "If you use this skill, please cite the software and the originating article."
-title: "QiaoZelong Supervisor Skill: Sparse Multi-Agent Orchestration"
+title: "Sparse Supervisor: Evidence-Backed Multi-Agent Orchestration"
 type: software
-abstract: "A sparse multi-agent orchestration Skill independently designed and implemented by Qiao Zelong."
+abstract: "A portable Skill and Python component for sparse, evidence-backed multi-agent orchestration."
 authors:
   - family-names: "Qiao"
     given-names: "Zelong"
-version: "1.3.0"
-date-released: "2026-08-13"
+version: "2.0.0"
+date-released: "2026-08-14"
 license: "MIT"
-repository-code: "https://github.com/qzl1111111/qiaozelong-supervisor-skill"
+repository-code: "https://github.com/qzl1111111/sparse-supervisor"
 references:
   - type: article
     title: "How artificial intelligence reshapes materials design and its evolutionary path"

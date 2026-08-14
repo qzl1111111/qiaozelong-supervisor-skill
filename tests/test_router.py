@@ -6,23 +6,29 @@ import unittest
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).parents[1] / "skills" / "qiaozelong-supervisor" / "scripts" / "route_specialists.py"
+SCRIPT = Path(__file__).parents[1] / "skills" / "sparse-supervisor" / "scripts" / "route_specialists.py"
 SPEC = importlib.util.spec_from_file_location("route_specialists", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC and SPEC.loader
 SPEC.loader.exec_module(MODULE)
 
-INSTALL_SCRIPT = Path(__file__).parents[1] / "skills" / "qiaozelong-supervisor" / "scripts" / "install_skill.py"
+INSTALL_SCRIPT = Path(__file__).parents[1] / "skills" / "sparse-supervisor" / "scripts" / "install_skill.py"
 INSTALL_SPEC = importlib.util.spec_from_file_location("install_skill", INSTALL_SCRIPT)
 INSTALL_MODULE = importlib.util.module_from_spec(INSTALL_SPEC)
 assert INSTALL_SPEC and INSTALL_SPEC.loader
 INSTALL_SPEC.loader.exec_module(INSTALL_MODULE)
 
-REGISTRY_SCRIPT = Path(__file__).parents[1] / "skills" / "qiaozelong-supervisor" / "scripts" / "capability_registry.py"
+REGISTRY_SCRIPT = Path(__file__).parents[1] / "skills" / "sparse-supervisor" / "scripts" / "capability_registry.py"
 REGISTRY_SPEC = importlib.util.spec_from_file_location("capability_registry", REGISTRY_SCRIPT)
 REGISTRY_MODULE = importlib.util.module_from_spec(REGISTRY_SPEC)
 assert REGISTRY_SPEC and REGISTRY_SPEC.loader
 REGISTRY_SPEC.loader.exec_module(REGISTRY_MODULE)
+
+KNOWLEDGE_SCRIPT = Path(__file__).parents[1] / "skills" / "sparse-supervisor" / "scripts" / "validate_knowledge_base.py"
+KNOWLEDGE_SPEC = importlib.util.spec_from_file_location("validate_knowledge_base", KNOWLEDGE_SCRIPT)
+KNOWLEDGE_MODULE = importlib.util.module_from_spec(KNOWLEDGE_SPEC)
+assert KNOWLEDGE_SPEC and KNOWLEDGE_SPEC.loader
+KNOWLEDGE_SPEC.loader.exec_module(KNOWLEDGE_MODULE)
 
 
 def candidate(
@@ -276,6 +282,91 @@ class CapabilityRegistryTests(unittest.TestCase):
     def test_registry_mode_rejects_manual_specialists(self) -> None:
         with self.assertRaises(ValueError):
             REGISTRY_MODULE.enrich_request({"specialists": [candidate("x", 0.5, 0.5, ["x"])]}, registry_fixture())
+
+
+KNOWLEDGE_TEXT = """# Expert knowledge
+
+## Scope
+Theory review only.
+## Core knowledge
+- Testable statement. [S1]
+## Decision rules
+1. Check evidence. [S1]
+## Workflow
+1. Inspect inputs.
+## Evidence standards
+Prefer primary evidence.
+## Known limitations
+No laboratory control.
+## Escalation triggers
+Conflicting safety evidence.
+## Terminology
+- Theory: explanatory model.
+"""
+
+
+def write_knowledge_expert(root: Path, *, source_id: str = "S1") -> Path:
+    directory = root / "theory-expert"
+    directory.mkdir(parents=True)
+    manifest = {
+        "schema_version": "1.0",
+        "expert_id": "theory-expert",
+        "display_name": "Theory Expert",
+        "summary": "Reviews theoretical evidence.",
+        "domains": ["materials"],
+        "capabilities": ["theory"],
+        "knowledge_files": ["knowledge.md"],
+        "languages": ["en"],
+        "updated_at": "2026-08-14",
+        "review_after": "2027-02-14",
+        "limitations": ["No lab control"],
+        "escalation_triggers": ["Safety conflict"],
+        "sources": [
+            {
+                "id": source_id,
+                "title": "Primary report",
+                "type": "paper",
+                "locator": "https://doi.org/example",
+                "published_at": "2025-01-01",
+                "accessed_at": "2026-08-14",
+                "authority": "primary",
+            }
+        ],
+    }
+    import json
+
+    (directory / "expert.json").write_text(json.dumps(manifest), encoding="utf-8")
+    (directory / "knowledge.md").write_text(KNOWLEDGE_TEXT, encoding="utf-8")
+    return directory
+
+
+class KnowledgeBaseTests(unittest.TestCase):
+    def test_valid_expert_entry(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            write_knowledge_expert(root)
+            result = KNOWLEDGE_MODULE.validate_knowledge_base(root)
+            self.assertEqual(result[0]["expert_id"], "theory-expert")
+
+    def test_directory_must_match_expert_id(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            directory = write_knowledge_expert(root)
+            manifest_path = directory / "expert.json"
+            import json
+
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["expert_id"] = "different-id"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                KNOWLEDGE_MODULE.validate_knowledge_base(root)
+
+    def test_unknown_source_reference_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            write_knowledge_expert(root, source_id="S2")
+            with self.assertRaises(ValueError):
+                KNOWLEDGE_MODULE.validate_knowledge_base(root)
 
 
 if __name__ == "__main__":

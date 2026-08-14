@@ -1,4 +1,4 @@
-# QiaoZelong Supervisor Skill
+# Sparse Supervisor
 
 An Agent Skill for **sparse multi-agent orchestration** across Codex, Claude Code, Hermes Agent, and compatible hosts: one supervisory agent evaluates a task, selects only the necessary specialist agents, assigns authority/work weights, and integrates evidence into one accountable result.
 
@@ -24,7 +24,7 @@ The design avoids launching every available agent. Specialists remain on standby
 
 The skill is useful today as a disciplined routing and accountability layer. Its main benefit is not making individual agents smarter; it is preventing unnecessary agents from acting, assigning clear ownership, and making the supervisor explain why each specialist receives work.
 
-The included deterministic router makes allocation reproducible. Version 1.3 adds a persistent capability-registry schema and converts capability, domain and tool coverage, measured benchmarks, historical outcomes, cost, and availability into auditable routing inputs. Manual scoring remains available for backward compatibility.
+The included deterministic router makes allocation reproducible. Version 2.0 uses a neutral project identity and combines a portable Skill, Python routing components, an evidence-backed capability registry, and a validated expert knowledge-base format. Manual scoring remains available for backward compatibility.
 
 The current version does **not** run benchmarks automatically. Registry quality still depends on traceable benchmark sources and reviewed outcome records; placeholder or self-reported entries are not verified expertise.
 
@@ -43,21 +43,21 @@ The current version does **not** run benchmarks automatically. Registry quality 
 Preview automatic host detection without writing files:
 
 ```powershell
-python skills/qiaozelong-supervisor/scripts/install_skill.py --dry-run
+python skills/sparse-supervisor/scripts/install_skill.py --dry-run
 ```
 
 Install to every detected host, or explicitly install to all three supported hosts:
 
 ```powershell
-python skills/qiaozelong-supervisor/scripts/install_skill.py
-python skills/qiaozelong-supervisor/scripts/install_skill.py --targets all
+python skills/sparse-supervisor/scripts/install_skill.py
+python skills/sparse-supervisor/scripts/install_skill.py --targets all
 ```
 
 The target directories are:
 
-- Codex: `~/.codex/skills/qiaozelong-supervisor`
-- Claude Code: `~/.claude/skills/qiaozelong-supervisor`
-- Hermes Agent: `~/.hermes/skills/qiaozelong-supervisor`
+- Codex: `~/.codex/skills/sparse-supervisor`
+- Claude Code: `~/.claude/skills/sparse-supervisor`
+- Hermes Agent: `~/.hermes/skills/sparse-supervisor`
 
 Existing installations are not overwritten unless `--force` is supplied. Compatible hosts can recognize the Skill from natural-language delegation and orchestration requests through its description; direct invocation remains available where supported.
 
@@ -65,30 +65,42 @@ Existing installations are not overwritten unless `--force` is supplied. Compati
 
 Invoke the skill with a task such as:
 
-> Use `$qiaozelong-supervisor` to plan a catalyst-screening study. Select only the specialist agents that are actually needed and show the routing weights.
+> Use `$sparse-supervisor` to plan a catalyst-screening study. Select only the specialist agents that are actually needed and show the routing weights.
 
 The included router can validate a supervisor's structured scoring decision:
 
 ```powershell
-python skills/qiaozelong-supervisor/scripts/route_specialists.py route-request.json
+python skills/sparse-supervisor/scripts/route_specialists.py route-request.json
 ```
 
-Version 1.3 can instead derive specialist scores from a persistent registry:
+The router can instead derive specialist scores from a persistent registry:
 
 ```powershell
-python skills/qiaozelong-supervisor/scripts/route_specialists.py task.json --registry capability-registry.json
+python skills/sparse-supervisor/scripts/route_specialists.py task.json --registry capability-registry.json
 ```
 
-See `skills/qiaozelong-supervisor/references/routing-schema.md` and `capability-registry.md` for the schemas. A clearly marked example registry is included for adaptation; its placeholder sources are not performance evidence.
+See `skills/sparse-supervisor/references/routing-schema.md` and `capability-registry.md` for the schemas. A clearly marked example registry is included for adaptation; its placeholder sources are not performance evidence.
 
-## Attribution
+## Expert knowledge base
 
-The “agent collective + supervisory controller” solution and its dynamic authority-allocation concept were proposed by **Qiao Zelong (乔泽龙 / QiaoZelong)**. This Skill and its software implementation were independently designed and developed by Qiao Zelong. The concept was formalized in his first-author article:
+Write one directory per expert containing `expert.json` and one or more Markdown knowledge files. Start with the templates in `knowledge-base-template/` and validate your completed directory with:
+
+```powershell
+python skills/sparse-supervisor/scripts/validate_knowledge_base.py path/to/knowledge-base
+```
+
+The complete authoring format is in `skills/sparse-supervisor/references/expert-knowledge-base.md`.
+
+## Migration from v1
+
+The project and Skill identifier changed to `sparse-supervisor`. Install v2 in its new directory, verify it, then manually remove the legacy `qiaozelong-supervisor` installation. The installer reports legacy copies but never deletes them automatically.
+
+## Citation
 
 Qiao, Z. et al. *How Artificial Intelligence Reshapes Materials Design and Its Evolutionary Path*. **Chinese Science Bulletin**, 2026, 71(23), 5465-5472. Published August 2026. DOI: [10.1360/CSB-2025-5797](https://doi.org/10.1360/CSB-2025-5797).
-
-This repository implements and generalizes that orchestration idea as a reusable cross-platform Agent Skill. Implementation date: **2026-08-13**.
 
 ## License
 
 MIT. The article and publisher-formatted figures are not included in this repository and are not covered by the software license.
+
+By QiaoZelong.

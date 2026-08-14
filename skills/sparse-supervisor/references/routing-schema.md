@@ -2,7 +2,7 @@
 
 Use the router when a reproducible allocation record is useful. The router enforces delegation gates, capability coverage, sparse selection, budget limits, and risk review. It does not judge semantic truth; the supervisor must ground scores in observable evidence.
 
-For v1.3 registry-backed scoring, omit `specialists`, add optional `relevant_domains` and `required_tools`, and pass `--registry`. Read [capability-registry.md](capability-registry.md) for the registry schema and deterministic derivation rules. The manual schema below remains supported.
+For registry-backed scoring, omit `specialists`, add optional `relevant_domains` and `required_tools`, and pass `--registry`. Read [capability-registry.md](capability-registry.md) for the registry schema and deterministic derivation rules. The manual schema below remains supported.
 
 ## Input
 

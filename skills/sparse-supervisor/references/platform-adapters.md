@@ -10,14 +10,14 @@ Automatic recognition means the host can discover and choose the Skill. It does 
 
 ## Codex
 
-- Install under `~/.codex/skills/qiaozelong-supervisor/`.
+- Install under `~/.codex/skills/sparse-supervisor/`.
 - When collaboration/subagent tools are exposed, create only agents listed in `activated`.
 - Keep the root agent as supervisor and final integrator.
 - Do not spawn agents for `supervisor_only` or `blocked` plans.
 
 ## Claude Code
 
-- Install under `~/.claude/skills/qiaozelong-supervisor/`.
+- Install under `~/.claude/skills/sparse-supervisor/`.
 - Claude Code can automatically load project or personal skills from its skills directories.
 - Use available subagent or agent-team capabilities only for `activated` roles. Tool names and team features may vary by Claude Code version and configuration.
 - If no delegation capability is available, execute activated roles sequentially in the main session and disclose that limitation.
@@ -25,7 +25,7 @@ Automatic recognition means the host can discover and choose the Skill. It does 
 
 ## Hermes Agent
 
-- Install under `~/.hermes/skills/qiaozelong-supervisor/`, or install the repository's raw `SKILL.md` using Hermes skill commands.
+- Install under `~/.hermes/skills/sparse-supervisor/`, or install the repository's raw `SKILL.md` using Hermes skill commands.
 - Hermes exposes installed skills as slash commands and may select them from natural-language requests.
 - Use `delegate_task` only for roles listed in `activated`; do not delegate standby roles.
 - Respect Hermes toolset configuration and skill-write approval settings.
@@ -33,7 +33,7 @@ Automatic recognition means the host can discover and choose the Skill. It does 
 
 ## Other Agent Skills hosts
 
-Install the `qiaozelong-supervisor` folder in the host's Agent Skills directory. The portable layer requires only `SKILL.md`, references, and the standard-library router. Unknown hosts should default to sequential execution rather than guessing a delegation API.
+Install the `sparse-supervisor` folder in the host's Agent Skills directory. The portable layer requires only `SKILL.md`, references, and the standard-library router. Unknown hosts should default to sequential execution rather than guessing a delegation API.
 
 ## Enforcement boundary
 

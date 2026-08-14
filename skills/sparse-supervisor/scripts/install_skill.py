@@ -7,7 +7,8 @@ from pathlib import Path
 from typing import Callable
 
 
-SKILL_NAME = "qiaozelong-supervisor"
+SKILL_NAME = "sparse-supervisor"
+LEGACY_SKILL_NAME = "qiaozelong-supervisor"
 TARGETS = {
     "codex": Path(".codex") / "skills" / SKILL_NAME,
     "claude": Path(".claude") / "skills" / SKILL_NAME,
@@ -67,7 +68,7 @@ def install(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Detect and install QiaoZelong Supervisor across agent hosts")
+    parser = argparse.ArgumentParser(description="Detect and install Sparse Supervisor across agent hosts")
     parser.add_argument("--targets", nargs="+", default=["auto"], help="auto, all, or: codex claude hermes")
     parser.add_argument("--force", action="store_true", help="Replace an existing installed copy")
     parser.add_argument("--dry-run", action="store_true", help="Show destinations without writing")
@@ -82,6 +83,9 @@ def main(argv: list[str] | None = None) -> int:
 
     for target, result in results.items():
         print(f"{target}: {result['status']} -> {result['path']}")
+        legacy = args.home / TARGETS[target].parent / LEGACY_SKILL_NAME
+        if legacy.exists():
+            print(f"{target}: legacy copy remains at {legacy}; remove it manually after verifying v2")
     if any(result["status"] == "exists" for result in results.values()):
         print("Use --force to replace existing copies.", file=sys.stderr)
         return 2

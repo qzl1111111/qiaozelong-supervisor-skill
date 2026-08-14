@@ -1,6 +1,0 @@
-interface:
-  display_name: "QiaoZelong Supervisor"
-  short_description: "按专业度和任务阶段选择性调度少量专业智能体并分配工作权重"
-  default_prompt: "Use $qiaozelong-supervisor to select only the necessary specialist agents, assign weights, and integrate one accountable result."
-policy:
-  allow_implicit_invocation: true
