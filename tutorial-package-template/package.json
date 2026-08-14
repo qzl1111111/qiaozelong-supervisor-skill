@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "package_id": "replace-me",
   "title": "REPLACE_ME",
   "version": "1.0.0",
@@ -10,5 +10,11 @@
   "description": "REPLACE_ME",
   "scope": ["REPLACE_ME"],
   "unit_shard_max_bytes": 5242880,
-  "unit_shard_max_records": 500
+  "unit_shard_max_records": 500,
+  "publication": {
+    "distribution": "local-only",
+    "source_metadata_visibility": "private",
+    "contains_original_files": false,
+    "upload_requires_explicit_user_approval": true
+  }
 }

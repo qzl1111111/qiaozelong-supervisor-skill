@@ -84,7 +84,8 @@ def validate_package(root: Path) -> dict[str, Any]:
     fail(not root.is_dir(), f"package directory does not exist: {root}")
     package = read_json(root / "package.json")
     package_id = str(package.get("package_id", ""))
-    fail(package.get("schema_version") != "1.0", "package schema_version must be 1.0")
+    schema_version = package.get("schema_version")
+    fail(schema_version not in {"1.0", "1.1"}, "package schema_version must be 1.0 or 1.1")
     fail(not PACKAGE_ID.fullmatch(package_id), "package_id must use lowercase hyphen-case")
     fail(not str(package.get("title", "")).strip(), "package title is required")
     fail(not VERSION.fullmatch(str(package.get("version", ""))), "package version must use MAJOR.MINOR.PATCH")
@@ -97,6 +98,13 @@ def validate_package(root: Path) -> dict[str, Any]:
     max_records = int(package.get("unit_shard_max_records", 500))
     fail(max_bytes <= 0 or max_bytes > 10_485_760, "unit_shard_max_bytes must be between 1 and 10485760")
     fail(max_records <= 0 or max_records > 1000, "unit_shard_max_records must be between 1 and 1000")
+    if schema_version == "1.1":
+        publication = package.get("publication")
+        fail(not isinstance(publication, dict), "schema 1.1 requires publication settings")
+        fail(publication.get("distribution") != "local-only", "tutorial packages must default to local-only")
+        fail(publication.get("source_metadata_visibility") != "private", "source metadata must remain private")
+        fail(publication.get("contains_original_files") is not False, "package must not contain original files")
+        fail(publication.get("upload_requires_explicit_user_approval") is not True, "explicit upload approval must be required")
 
     sources: dict[str, dict[str, Any]] = {}
     extraction_failures = 0
@@ -151,6 +159,7 @@ def validate_package(root: Path) -> dict[str, Any]:
                     fail(not isinstance(reference, dict), f"{context}: evidence must be objects")
                     source_id = str(reference.get("source_id", ""))
                     fail(not str(reference.get("locator", "")).strip(), f"{context}: evidence locator is required")
+                    fail(len(str(reference.get("evidence_excerpt", ""))) > 500, f"{context}: evidence_excerpt exceeds 500 characters")
                     has_evidence = True
                     if source_id not in sources:
                         unknown_source_refs += 1

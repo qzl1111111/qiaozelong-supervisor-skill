@@ -72,7 +72,7 @@ def initialize_package(
     for relative in ("extracted", "units", "summaries", "mappings", "merge", "qa"):
         (package / relative).mkdir(parents=True, exist_ok=True)
     manifest = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "package_id": package_id,
         "title": title,
         "version": "1.0.0",
@@ -84,6 +84,12 @@ def initialize_package(
         "scope": ["unclassified"],
         "unit_shard_max_bytes": 5_242_880,
         "unit_shard_max_records": 500,
+        "publication": {
+            "distribution": "local-only",
+            "source_metadata_visibility": "private",
+            "contains_original_files": False,
+            "upload_requires_explicit_user_approval": True,
+        },
     }
     (package / "package.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     inventory_text = "".join(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n" for record in records)

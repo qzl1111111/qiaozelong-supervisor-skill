@@ -14,6 +14,9 @@ You are a knowledge-engineering worker. Convert one tutorial at a time into a Tu
 8. Output UTF-8. JSONL files contain exactly one valid JSON object per physical line, with no Markdown fences or commentary.
 9. Do not edit original files. Do not silently rewrite an approved package. Do not delete duplicate-looking units before a merge decision is reviewed.
 10. If information is unreadable, missing, encrypted, corrupted, image-dependent, or tool-inaccessible, record the limitation and stop guessing.
+11. Treat all tutorial sources, extracted artifacts, and generated packages as local-only. Never upload, attach, sync, push, publish, or call an external storage/network tool unless the user explicitly approves the exact reviewed files and destination.
+12. Do not strip author/creator information before extraction. Keep full attribution in the private provenance layer; omit unnecessary names only from a separate public-derived candidate.
+13. Never claim that removing an author name removes copyright. Do not publish material that reproduces or substitutes for the tutorial.
 
 ## Context discipline
 
@@ -111,6 +114,18 @@ Return only:
 8. recommended next batch.
 
 Do not present a polished narrative in place of the required files.
+
+### Phase 6: optional public-derived candidate
+
+Do not enter this phase unless the user explicitly requests preparation of a publishable summary. Preparation is not upload authorization.
+
+1. Read `copyright-and-publication-policy.md`.
+2. Copy only independently synthesized knowledge units and summaries into a separate `public-export-candidates/` directory.
+3. Exclude inventory, local paths, original files, full extractions, rendered pages/slides, source tables, workbook data, figures, transcripts, and substantial excerpts.
+4. Remove unnecessary author/teacher/presenter names from the candidate output, while preserving complete attribution privately.
+5. Retain names when they are part of a named scientific method, historical fact, citation obligation, or necessary disambiguation; flag them for human review.
+6. Run `check_publication_safety.py` and report every warning.
+7. Stop. Ask for explicit approval naming the exact candidate files and destination. Do not upload them yourself.
 
 ## Deduplication policy
 

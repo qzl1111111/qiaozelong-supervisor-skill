@@ -2,6 +2,8 @@
 
 Use this standard to turn one heterogeneous tutorial into a portable, mergeable knowledge package. Keep original files outside the package and immutable. Never use a single large summary as the canonical knowledge store.
 
+All packages are local-only by default. Apply [copyright-and-publication-policy.md](copyright-and-publication-policy.md) before creating any public-derived export. Removing author names does not make copied material safe to publish.
+
 ## Design goals
 
 - Preserve exact provenance from every knowledge claim to a source location.
@@ -46,7 +48,7 @@ The initializer inventories files but does not parse or copy them. Keep the sour
 
 ```json
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "package_id": "crystallography-course-01",
   "title": "Tutorial title",
   "version": "1.0.0",
@@ -57,11 +59,19 @@ The initializer inventories files but does not parse or copy them. Keep the sour
   "description": "What this tutorial covers.",
   "scope": ["crystallography", "structure-analysis"],
   "unit_shard_max_bytes": 5242880,
-  "unit_shard_max_records": 500
+  "unit_shard_max_records": 500,
+  "publication": {
+    "distribution": "local-only",
+    "source_metadata_visibility": "private",
+    "contains_original_files": false,
+    "upload_requires_explicit_user_approval": true
+  }
 }
 ```
 
 Allowed status values are `draft`, `review`, `approved`, and `superseded`. Publish a new package version when source files or scientific interpretation change; do not silently rewrite an approved package.
+
+Schema `1.1` adds the required publication block. `approved` means scientifically reviewed inside the local workflow; it does not mean approved for public upload.
 
 ## `inventory.jsonl`
 
@@ -152,6 +162,8 @@ Allowed unit status values are `active`, `deprecated`, and `superseded`. Allowed
 
 Do not average incompatible definitions, formulas, conventions, or scientific conclusions. Create separate units and link them using `contradicts`, `alternative-to`, or `convention-variant` relations.
 
+Keep every evidence excerpt under 500 Unicode characters and use fewer whenever possible. The excerpt is for local verification, not public republication.
+
 ## Course overview
 
 `summaries/course-overview.md` is a derived human-readable guide. Include:
@@ -231,3 +243,5 @@ The validator calculates structural counts independently. A model-written `pass`
 ## Integration with expert knowledge bases
 
 After review, select approved units by `expert_id`, domain, capability, and role. Convert them into the expert Markdown structure or let retrieval load the units directly. Keep unit IDs and evidence links in the expert entry so later package updates can be traced, compared, and rolled back.
+
+Knowledge extraction may use complete local source context. Public export is a later, separate transformation that removes original files, extraction artifacts, local paths, unnecessary personal names, and substantial excerpts without weakening the private knowledge package.

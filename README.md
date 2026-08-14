@@ -97,6 +97,8 @@ For large mixed-format tutorial collections, first convert each tutorial into an
 - `skills/sparse-supervisor/references/luna-tutorial-ingestion-instructions.md`: strict model instructions;
 - `tutorial-package-template/`: editable output template.
 
+Tutorial sources, extracted full text, and generated knowledge packages are local-only by default. The repository ignores the recommended raw and working directories. No model or tool may upload any tutorial-related file without explicit approval for the exact reviewed files and destination. Public-derived summaries require a separate safety review; removing author names alone does not remove copyright.
+
 Validate a completed tutorial package with:
 
 ```powershell
@@ -108,6 +110,14 @@ Initialize a package and hash its source files before giving it to a model:
 ```powershell
 python skills/sparse-supervisor/scripts/init_tutorial_package.py path/to/one-tutorial path/to/tutorial-packages --package-id tutorial-01 --title "Tutorial 01"
 ```
+
+Check a separately prepared public-derived candidate without uploading it:
+
+```powershell
+python skills/sparse-supervisor/scripts/check_publication_safety.py path/to/public-export-candidate
+```
+
+A clean check only means “ready for human review.” Upload still requires explicit approval for the exact files and destination.
 
 ## Migration from v1
 

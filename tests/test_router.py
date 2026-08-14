@@ -43,6 +43,12 @@ INIT_TUTORIAL_MODULE = importlib.util.module_from_spec(INIT_TUTORIAL_SPEC)
 assert INIT_TUTORIAL_SPEC and INIT_TUTORIAL_SPEC.loader
 INIT_TUTORIAL_SPEC.loader.exec_module(INIT_TUTORIAL_MODULE)
 
+PUBLICATION_SCRIPT = Path(__file__).parents[1] / "skills" / "sparse-supervisor" / "scripts" / "check_publication_safety.py"
+PUBLICATION_SPEC = importlib.util.spec_from_file_location("check_publication_safety", PUBLICATION_SCRIPT)
+PUBLICATION_MODULE = importlib.util.module_from_spec(PUBLICATION_SPEC)
+assert PUBLICATION_SPEC and PUBLICATION_SPEC.loader
+PUBLICATION_SPEC.loader.exec_module(PUBLICATION_MODULE)
+
 
 def candidate(
     name: str,
@@ -407,11 +413,15 @@ def write_tutorial_package(root: Path, *, evidence_source: str | None = None) ->
     sha = "a" * 64
     source_id = f"src_{sha[:16]}"
     manifest = {
-        "schema_version": "1.0", "package_id": package_id, "title": "Crystal course",
+        "schema_version": "1.1", "package_id": package_id, "title": "Crystal course",
         "version": "1.0.0", "status": "review", "languages": ["zh-CN"],
         "created_at": "2026-08-14", "updated_at": "2026-08-14",
         "description": "Course package", "scope": ["crystallography"],
         "unit_shard_max_bytes": 5_242_880, "unit_shard_max_records": 500,
+        "publication": {
+            "distribution": "local-only", "source_metadata_visibility": "private",
+            "contains_original_files": False, "upload_requires_explicit_user_approval": True,
+        },
     }
     inventory = {
         "source_id": source_id, "relative_path": "course.pdf", "sha256": sha,
@@ -481,9 +491,48 @@ class TutorialPackageTests(unittest.TestCase):
             self.assertEqual(count, 1)
             self.assertEqual(warnings, [])
             record = json.loads((package / "inventory.jsonl").read_text(encoding="utf-8"))
+            manifest = json.loads((package / "package.json").read_text(encoding="utf-8"))
             self.assertEqual(record["relative_path"], "lesson.txt")
             self.assertTrue(record["source_id"].endswith(record["sha256"][:16]))
             self.assertFalse((package / "lesson.txt").exists())
+            self.assertEqual(manifest["publication"]["distribution"], "local-only")
+            self.assertTrue(manifest["publication"]["upload_requires_explicit_user_approval"])
+
+    def test_long_evidence_excerpt_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            package = write_tutorial_package(Path(temp_dir))
+            unit_path = package / "units" / "part-0001.jsonl"
+            unit = json.loads(unit_path.read_text(encoding="utf-8"))
+            unit["claims"][0]["evidence"][0]["evidence_excerpt"] = "x" * 501
+            unit_path.write_text(json.dumps(unit) + "\n", encoding="utf-8")
+            with self.assertRaises(ValueError):
+                TUTORIAL_MODULE.validate_package(package)
+
+
+class PublicationSafetyTests(unittest.TestCase):
+    def test_derived_markdown_requires_human_approval(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "summary.md").write_text("Original scientific synthesis.", encoding="utf-8")
+            result = PUBLICATION_MODULE.check_candidate(root)
+            self.assertEqual(result["status"], "ready-for-human-review")
+            self.assertFalse(result["upload_authorized"])
+
+    def test_original_binary_is_blocked(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "tutorial.pdf").write_bytes(b"not a real pdf")
+            result = PUBLICATION_MODULE.check_candidate(root)
+            self.assertEqual(result["status"], "blocked")
+            self.assertTrue(any("file type" in item for item in result["blockers"]))
+
+    def test_author_metadata_is_blocked_from_public_candidate(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "unit.json").write_text(json.dumps({"summary": "Derived knowledge", "author": "A Name"}), encoding="utf-8")
+            result = PUBLICATION_MODULE.check_candidate(root)
+            self.assertEqual(result["status"], "blocked")
+            self.assertTrue(any("author metadata" in item for item in result["blockers"]))
 
 
 if __name__ == "__main__":

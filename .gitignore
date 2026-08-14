@@ -2,3 +2,10 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .DS_Store
+
+# Copyrighted tutorial sources and private processing outputs stay local.
+raw-tutorials/
+tutorial-packages/
+private-provenance/
+public-export-candidates/
+**/extracted/

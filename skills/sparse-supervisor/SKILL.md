@@ -28,6 +28,8 @@ Act as the single supervisory agent. Own task interpretation, routing, stage tra
 
 When converting large, heterogeneous tutorial collections into reusable expert knowledge, process each tutorial as an independent Tutorial Knowledge Package. Read [references/tutorial-knowledge-package.md](references/tutorial-knowledge-package.md) for the schema and [references/luna-tutorial-ingestion-instructions.md](references/luna-tutorial-ingestion-instructions.md) for the strict staged workflow. Validate every package before mapping units into an expert knowledge base.
 
+Treat tutorial sources, complete extractions, and generated packages as local-only by default. Read [references/copyright-and-publication-policy.md](references/copyright-and-publication-policy.md) before any Git, cloud, attachment, synchronization, or publishing action. Never upload any tutorial-related file without explicit approval for the exact reviewed files and destination.
+
 ## Default routing policy
 
 - Activate at most 3 specialists; prefer 1 or 2.
