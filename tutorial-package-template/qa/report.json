@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "package_id": "replace-me",
+  "inventory_records": 0,
+  "knowledge_units": 0,
+  "units_without_evidence": 0,
+  "unknown_source_references": 0,
+  "extraction_failures": 0,
+  "duplicate_candidates": 0,
+  "conflict_clusters": 0,
+  "unresolved_items": ["REPLACE_ME"],
+  "validation_status": "fail"
+}

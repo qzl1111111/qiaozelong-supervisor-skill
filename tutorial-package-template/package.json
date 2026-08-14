@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "package_id": "replace-me",
+  "title": "REPLACE_ME",
+  "version": "1.0.0",
+  "status": "draft",
+  "languages": ["zh-CN"],
+  "created_at": "2026-08-14",
+  "updated_at": "2026-08-14",
+  "description": "REPLACE_ME",
+  "scope": ["REPLACE_ME"],
+  "unit_shard_max_bytes": 5242880,
+  "unit_shard_max_records": 500
+}

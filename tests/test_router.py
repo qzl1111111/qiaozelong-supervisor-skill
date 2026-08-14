@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -29,6 +30,18 @@ KNOWLEDGE_SPEC = importlib.util.spec_from_file_location("validate_knowledge_base
 KNOWLEDGE_MODULE = importlib.util.module_from_spec(KNOWLEDGE_SPEC)
 assert KNOWLEDGE_SPEC and KNOWLEDGE_SPEC.loader
 KNOWLEDGE_SPEC.loader.exec_module(KNOWLEDGE_MODULE)
+
+TUTORIAL_SCRIPT = Path(__file__).parents[1] / "skills" / "sparse-supervisor" / "scripts" / "validate_tutorial_package.py"
+TUTORIAL_SPEC = importlib.util.spec_from_file_location("validate_tutorial_package", TUTORIAL_SCRIPT)
+TUTORIAL_MODULE = importlib.util.module_from_spec(TUTORIAL_SPEC)
+assert TUTORIAL_SPEC and TUTORIAL_SPEC.loader
+TUTORIAL_SPEC.loader.exec_module(TUTORIAL_MODULE)
+
+INIT_TUTORIAL_SCRIPT = Path(__file__).parents[1] / "skills" / "sparse-supervisor" / "scripts" / "init_tutorial_package.py"
+INIT_TUTORIAL_SPEC = importlib.util.spec_from_file_location("init_tutorial_package", INIT_TUTORIAL_SCRIPT)
+INIT_TUTORIAL_MODULE = importlib.util.module_from_spec(INIT_TUTORIAL_SPEC)
+assert INIT_TUTORIAL_SPEC and INIT_TUTORIAL_SPEC.loader
+INIT_TUTORIAL_SPEC.loader.exec_module(INIT_TUTORIAL_MODULE)
 
 
 def candidate(
@@ -333,8 +346,6 @@ def write_knowledge_expert(root: Path, *, source_id: str = "S1") -> Path:
             }
         ],
     }
-    import json
-
     (directory / "expert.json").write_text(json.dumps(manifest), encoding="utf-8")
     (directory / "knowledge.md").write_text(KNOWLEDGE_TEXT, encoding="utf-8")
     return directory
@@ -353,8 +364,6 @@ class KnowledgeBaseTests(unittest.TestCase):
             root = Path(temp_dir)
             directory = write_knowledge_expert(root)
             manifest_path = directory / "expert.json"
-            import json
-
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             manifest["expert_id"] = "different-id"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
@@ -367,6 +376,114 @@ class KnowledgeBaseTests(unittest.TestCase):
             write_knowledge_expert(root, source_id="S2")
             with self.assertRaises(ValueError):
                 KNOWLEDGE_MODULE.validate_knowledge_base(root)
+
+
+OVERVIEW_TEXT = """# Course overview
+
+## Scope and audience
+Scientists.
+## Source coverage
+One source.
+## Topic hierarchy
+Crystallography.
+## Prerequisites
+Geometry.
+## Key knowledge units
+- Definition (`ku_crystal-course_000001`).
+## Formulas, units, and conventions
+State conventions.
+## Limitations and unresolved questions
+None.
+## Candidate expert mappings
+Materials theory.
+"""
+
+
+def write_tutorial_package(root: Path, *, evidence_source: str | None = None) -> Path:
+    package_id = "crystal-course"
+    package = root / package_id
+    for relative in ("units", "summaries", "mappings", "merge", "qa"):
+        (package / relative).mkdir(parents=True, exist_ok=True)
+    sha = "a" * 64
+    source_id = f"src_{sha[:16]}"
+    manifest = {
+        "schema_version": "1.0", "package_id": package_id, "title": "Crystal course",
+        "version": "1.0.0", "status": "review", "languages": ["zh-CN"],
+        "created_at": "2026-08-14", "updated_at": "2026-08-14",
+        "description": "Course package", "scope": ["crystallography"],
+        "unit_shard_max_bytes": 5_242_880, "unit_shard_max_records": 500,
+    }
+    inventory = {
+        "source_id": source_id, "relative_path": "course.pdf", "sha256": sha,
+        "size_bytes": 100, "media_type": "application/pdf", "source_role": "primary-tutorial",
+        "extraction_status": "complete", "extracted_artifacts": [], "warnings": [],
+    }
+    unit_id = "ku_crystal-course_000001"
+    unit = {
+        "schema_version": "1.0", "unit_id": unit_id, "package_id": package_id,
+        "title": "Unit cell", "domain_path": ["crystallography"], "knowledge_type": "concept",
+        "summary": "A reusable definition.",
+        "claims": [{"claim_id": "C1", "text": "Definition.", "evidence": [{
+            "source_id": evidence_source or source_id, "locator": "page=1", "evidence_excerpt": "Short excerpt."
+        }]}],
+        "prerequisites": [], "keywords": ["unit cell"], "applicability": ["crystals"],
+        "limitations": ["Convention dependent"], "relations": [],
+        "merge_key": "crystallography/unit-cell/definition", "status": "active", "supersedes": [],
+        "review": {"status": "model-reviewed", "confidence": 0.8, "reviewer": "model", "notes": ""},
+    }
+    mapping = {"unit_id": unit_id, "expert_id": "materials-theory", "role": "core", "relevance": 0.9, "reason": "Core concept", "status": "candidate"}
+    decision = {"cluster_id": "cluster_000001", "action": "keep-separate", "canonical_unit_id": unit_id, "member_unit_ids": [unit_id], "rationale": "Unique", "conflicts": [], "status": "needs-review"}
+    report = {
+        "schema_version": "1.0", "package_id": package_id, "inventory_records": 1,
+        "knowledge_units": 1, "units_without_evidence": 0,
+        "unknown_source_references": 0 if evidence_source is None else 1,
+        "extraction_failures": 0, "duplicate_candidates": 0, "conflict_clusters": 0,
+        "unresolved_items": [], "validation_status": "pass",
+    }
+    (package / "package.json").write_text(json.dumps(manifest), encoding="utf-8")
+    (package / "inventory.jsonl").write_text(json.dumps(inventory) + "\n", encoding="utf-8")
+    (package / "units" / "part-0001.jsonl").write_text(json.dumps(unit) + "\n", encoding="utf-8")
+    (package / "summaries" / "course-overview.md").write_text(OVERVIEW_TEXT, encoding="utf-8")
+    (package / "mappings" / "expert-units.jsonl").write_text(json.dumps(mapping) + "\n", encoding="utf-8")
+    (package / "merge" / "decisions.jsonl").write_text(json.dumps(decision) + "\n", encoding="utf-8")
+    (package / "qa" / "report.json").write_text(json.dumps(report), encoding="utf-8")
+    return package
+
+
+class TutorialPackageTests(unittest.TestCase):
+    def test_valid_package(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            package = write_tutorial_package(Path(temp_dir))
+            result = TUTORIAL_MODULE.validate_package(package)
+            self.assertEqual(result["sources"], 1)
+            self.assertEqual(result["units"], 1)
+
+    def test_unknown_evidence_source_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            package = write_tutorial_package(Path(temp_dir), evidence_source="src_bbbbbbbbbbbbbbbb")
+            with self.assertRaises(ValueError):
+                TUTORIAL_MODULE.validate_package(package)
+
+    def test_template_placeholders_are_rejected(self) -> None:
+        template = Path(__file__).parents[1] / "tutorial-package-template"
+        with self.assertRaises(ValueError):
+            TUTORIAL_MODULE.validate_package(template)
+
+    def test_initializer_hashes_without_copying_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source = root / "source"
+            source.mkdir()
+            (source / "lesson.txt").write_text("crystal knowledge", encoding="utf-8")
+            package, count, warnings = INIT_TUTORIAL_MODULE.initialize_package(
+                source, root / "packages", "lesson-one", "Lesson One"
+            )
+            self.assertEqual(count, 1)
+            self.assertEqual(warnings, [])
+            record = json.loads((package / "inventory.jsonl").read_text(encoding="utf-8"))
+            self.assertEqual(record["relative_path"], "lesson.txt")
+            self.assertTrue(record["source_id"].endswith(record["sha256"][:16]))
+            self.assertFalse((package / "lesson.txt").exists())
 
 
 if __name__ == "__main__":

@@ -26,6 +26,8 @@ Act as the single supervisory agent. Own task interpretation, routing, stage tra
 11. Re-route at every meaningful stage change. Do not reuse stale weights automatically.
 12. Integrate the final result yourself. Record capability coverage, selected roles, weights, rejected roles, evidence, disagreements, confidence, budget use, and unresolved risks.
 
+When converting large, heterogeneous tutorial collections into reusable expert knowledge, process each tutorial as an independent Tutorial Knowledge Package. Read [references/tutorial-knowledge-package.md](references/tutorial-knowledge-package.md) for the schema and [references/luna-tutorial-ingestion-instructions.md](references/luna-tutorial-ingestion-instructions.md) for the strict staged workflow. Validate every package before mapping units into an expert knowledge base.
+
 ## Default routing policy
 
 - Activate at most 3 specialists; prefer 1 or 2.

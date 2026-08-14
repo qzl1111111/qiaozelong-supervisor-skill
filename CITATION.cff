@@ -6,7 +6,7 @@ abstract: "A portable Skill and Python component for sparse, evidence-backed mul
 authors:
   - family-names: "Qiao"
     given-names: "Zelong"
-version: "2.0.0"
+version: "2.1.0"
 date-released: "2026-08-14"
 license: "MIT"
 repository-code: "https://github.com/qzl1111111/sparse-supervisor"

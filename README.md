@@ -91,6 +91,24 @@ python skills/sparse-supervisor/scripts/validate_knowledge_base.py path/to/knowl
 
 The complete authoring format is in `skills/sparse-supervisor/references/expert-knowledge-base.md`.
 
+For large mixed-format tutorial collections, first convert each tutorial into an independent Tutorial Knowledge Package. This preserves source locations, supports JSONL sharding and later deduplication, and keeps expert mapping separate from extraction:
+
+- `skills/sparse-supervisor/references/tutorial-knowledge-package.md`: package specification;
+- `skills/sparse-supervisor/references/luna-tutorial-ingestion-instructions.md`: strict model instructions;
+- `tutorial-package-template/`: editable output template.
+
+Validate a completed tutorial package with:
+
+```powershell
+python skills/sparse-supervisor/scripts/validate_tutorial_package.py path/to/tutorial-package
+```
+
+Initialize a package and hash its source files before giving it to a model:
+
+```powershell
+python skills/sparse-supervisor/scripts/init_tutorial_package.py path/to/one-tutorial path/to/tutorial-packages --package-id tutorial-01 --title "Tutorial 01"
+```
+
 ## Migration from v1
 
 The project and Skill identifier changed to `sparse-supervisor`. Install v2 in its new directory, verify it, then manually remove the legacy `qiaozelong-supervisor` installation. The installer reports legacy copies but never deletes them automatically.
