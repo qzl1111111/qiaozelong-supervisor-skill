@@ -485,14 +485,16 @@ class TutorialPackageTests(unittest.TestCase):
             source = root / "source"
             source.mkdir()
             (source / "lesson.txt").write_text("crystal knowledge", encoding="utf-8")
+            (source / "pdf-password.local.txt").write_text("private-password", encoding="utf-8")
             package, count, warnings = INIT_TUTORIAL_MODULE.initialize_package(
                 source, root / "packages", "lesson-one", "Lesson One"
             )
             self.assertEqual(count, 1)
-            self.assertEqual(warnings, [])
+            self.assertEqual(warnings, ["skipped local secret file: pdf-password.local.txt"])
             record = json.loads((package / "inventory.jsonl").read_text(encoding="utf-8"))
             manifest = json.loads((package / "package.json").read_text(encoding="utf-8"))
             self.assertEqual(record["relative_path"], "lesson.txt")
+            self.assertNotIn("private-password", (package / "inventory.jsonl").read_text(encoding="utf-8"))
             self.assertTrue(record["source_id"].endswith(record["sha256"][:16]))
             self.assertFalse((package / "lesson.txt").exists())
             self.assertEqual(manifest["publication"]["distribution"], "local-only")

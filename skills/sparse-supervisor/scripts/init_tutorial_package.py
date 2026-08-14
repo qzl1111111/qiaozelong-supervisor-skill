@@ -11,6 +11,12 @@ from typing import Any
 
 
 PACKAGE_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+SECRET_FILENAMES = {".env", "credentials.json", "secrets.json", "pdf-password.local.txt"}
+
+
+def is_local_secret(path: Path) -> bool:
+    name = path.name.lower()
+    return name in SECRET_FILENAMES or ".local." in name or name.endswith((".secret", ".credentials"))
 
 
 def sha256_file(path: Path) -> str:
@@ -31,6 +37,9 @@ def inventory_source(source_root: Path) -> tuple[list[dict[str, Any]], list[str]
             warnings.append(f"skipped symbolic link: {path.relative_to(source_root).as_posix()}")
             continue
         if not path.is_file():
+            continue
+        if is_local_secret(path):
+            warnings.append(f"skipped local secret file: {path.relative_to(source_root).as_posix()}")
             continue
         sha = sha256_file(path)
         media_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
