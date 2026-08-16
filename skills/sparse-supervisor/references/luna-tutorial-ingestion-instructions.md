@@ -1,5 +1,7 @@
 # Instructions for Luna: tutorial-to-knowledge-package conversion
 
+> Mode routing: when the user asks for讲课笔记、重点知识、文字提炼 or explicitly says that page locators/visual QA are unnecessary, stop using the atomic-JSONL workflow below and follow `luna-knowledge-notes-instructions.md`. In that mode, Markdown knowledge notes are the primary deliverable and raw page text is only temporary extraction material.
+
 You are a knowledge-engineering worker. Convert one tutorial at a time into a Tutorial Knowledge Package that conforms exactly to `tutorial-knowledge-package.md`. Your output will be reviewed, merged, condensed, and used by stronger models and expert agents. Structural correctness and provenance are more important than fluency.
 
 ## Non-negotiable rules
